@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="he" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OsintTommy - Advanced Cyber Intelligence & Recon Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Rubik+Black&family=Ultra&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --red-primary: #ff003c;
+            --red-glow: rgba(255, 0, 60, 0.8);
+            --red-subtle: rgba(255, 0, 60, 0.15);
+            --dark-bg: #050508;
+            --panel-bg: rgba(10, 10, 14, 0.95);
+            --border-red: rgba(255, 0, 60, 0.4);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'JetBrains Mono', 'Rubik Black', monospace, sans-serif;
+            overflow-x: hidden;
+            user-select: none;
+            letter-spacing: 1px;
+        }
+
+        .heavy-font {
+            font-family: 'Rubik Black', 'Ultra', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .mono-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Glitch & Red Neon Text Effect */
+        .glitch-text-red {
+            position: relative;
+            color: #ffffff;
+            font-weight: 900;
+            letter-spacing: 5px;
+            text-shadow: 
+                0 0 10px rgba(255, 0, 60, 0.9),
+                0 0 20px rgba(255, 0, 60, 0.5),
+                2px 0 #ff003c,
+                -2px 0 #880000;
+            animation: glitch-anim-red 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-red {
+            0% {
+                text-shadow: 0 0 10px rgba(255, 0, 60, 0.9), 2px 0 #ff003c, -2px 0 #330000;
+            }
+            25% {
+                text-shadow: 0 0 15px rgba(255, 0, 60, 1), -3px 0 #ff3366, 2px 0 #000;
+            }
+            50% {
+                text-shadow: 0 0 8px rgba(255, 0, 60, 0.7), 3px -1px #ff003c, -1px 1px #ff1a40;
+            }
+            75% {
+                text-shadow: 0 0 20px rgba(255, 0, 60, 0.9), -2px 2px #cc0033, 1px -1px #990000;
+            }
+            100% {
+                text-shadow: 0 0 12px rgba(255, 0, 60, 0.8), 2px 0 #ff003c, -2px 0 #550000;
+            }
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: #030305;
+        }
+
+        /* Glassmorphic Panels with Red Borders */
+        .red-glass-card {
+            background: rgba(8, 8, 12, 0.92);
+            border: 2px solid var(--red-primary);
+            border-radius: 20px;
+            box-shadow: 
+                0 0 30px rgba(255, 0, 60, 0.25),
+                inset 0 0 20px rgba(255, 0, 60, 0.1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .red-glass-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 0, 60, 0.08), transparent);
+            transform: rotate(45deg);
+            animation: redScanline 5s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes redScanline {
+            0% { transform: translateY(-100%) rotate(45deg); }
+            100% { transform: translateY(100%) rotate(45deg); }
+        }
+
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(3, 3, 5, 0.98);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(25px);
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .lock-card {
+            padding: 55px 45px;
+            text-align: center;
+            width: 490px;
+            max-width: 92vw;
+        }
+
+        .logo-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 25px auto;
+            filter: drop-shadow(0 0 30px rgba(255, 0, 60, 0.8));
+            animation: pulseRedLogo 3s infinite alternate;
+        }
+
+        @keyframes pulseRedLogo {
+            0% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255, 0, 60, 0.6)); }
+            100% { transform: scale(1.06); filter: drop-shadow(0 0 45px rgba(255, 0, 60, 1)); }
+        }
+
+        .lock-title {
+            font-size: 46px;
+            line-height: 1;
+            margin: 0 0 8px 0;
+            letter-spacing: 5px;
+        }
+
+        .lock-subtitle {
+            color: #ff4d6d;
+            font-size: 11px;
+            margin-bottom: 35px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(255, 0, 60, 0.7);
+        }
+
+        .login-input {
+            width: 100%;
+            background: #000000;
+            border: 2px solid var(--red-primary);
+            color: #ffffff;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 20px;
+            text-align: center;
+            outline: none;
+            box-sizing: border-box;
+            letter-spacing: 8px;
+            box-shadow: inset 0 0 15px rgba(255, 0, 60, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .login-input:focus {
+            border-color: #ff3366;
+            box-shadow: 0 0 35px rgba(255, 0, 60, 0.9), inset 0 0 20px rgba(255, 0, 60, 0.4);
+        }
+
+        .red-btn {
+            width: 100%;
+            background: rgba(255, 0, 60, 0.15);
+            color: #ffffff;
+            border: 2px solid var(--red-primary);
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 15px;
+            cursor: pointer;
+            letter-spacing: 3px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 25px rgba(255, 0, 60, 0.3), inset 0 0 15px rgba(255, 0, 60, 0.15);
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 0 10px rgba(255, 0, 60, 0.8);
+        }
+
+        .red-btn:hover {
+            background: var(--red-primary);
+            color: #ffffff;
+            box-shadow: 0 0 50px rgba(255, 0, 60, 1), inset 0 0 20px rgba(0, 0, 0, 0.4);
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .error-msg {
+            color: #ff3366;
+            background: rgba(30, 0, 10, 0.9);
+            border: 1px solid var(--red-primary);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-top: 18px;
+            display: none;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 0, 60, 0.8);
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        #main-app {
+            display: none;
+            padding: 35px;
+            max-width: 1450px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--red-primary);
+            background: rgba(8, 8, 12, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 22px 35px;
+            border-radius: 20px;
+            margin-bottom: 35px;
+            box-shadow: 0 0 40px rgba(255, 0, 60, 0.3);
+        }
+
+        .tool-tab {
+            background: #08080a;
+            border: 2px solid #330010;
+            color: #aa5566;
+            padding: 16px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 13px;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.05);
+        }
+
+        .tool-tab:hover, .tool-tab.active {
+            background: rgba(255, 0, 60, 0.2);
+            border-color: var(--red-primary);
+            color: #ffffff;
+            box-shadow: 0 0 35px rgba(255, 0, 60, 0.6);
+            transform: translateY(-3px);
+            text-shadow: 0 0 10px rgba(255, 0, 60, 0.8);
+        }
+
+        .workspace {
+            padding: 50px;
+            min-height: 520px;
+        }
+
+        .tool-panel {
+            display: none;
+        }
+
+        .tool-panel.active {
+            display: block;
+        }
+
+        .osint-input {
+            background: #000000;
+            border: 2px solid #550015;
+            color: #ffffff;
+            padding: 18px 24px;
+            border-radius: 12px;
+            font-size: 17px;
+            outline: none;
+            transition: 0.3s;
+            box-shadow: inset 0 0 15px rgba(255, 0, 60, 0.1);
+        }
+
+        .osint-input:focus {
+            border-color: var(--red-primary);
+            box-shadow: 0 0 35px rgba(255, 0, 60, 0.6), inset 0 0 15px rgba(255, 0, 60, 0.2);
+        }
+
+        .results-box {
+            background: #000000;
+            border: 2px solid var(--red-primary);
+            border-radius: 14px;
+            padding: 30px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #ffccd5;
+            max-height: 420px;
+            overflow-y: auto;
+            display: none;
+            box-shadow: inset 0 0 25px rgba(255, 0, 60, 0.2);
+            text-shadow: 0 0 6px rgba(255, 0, 60, 0.4);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050508;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--red-primary);
+            border-radius: 4px;
+            box-shadow: 0 0 10px var(--red-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Red Tactical Wave Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Login Authentication Screen -->
+    <div id="login-screen">
+        <div class="lock-card red-glass-card heavy-font">
+            <!-- Incognito / Fedora & Glasses Logo SVG matching image -->
+            <div class="logo-container">
+                <svg viewBox="0 0 500 500" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#ffffff">
+                        <!-- Fedora Hat Top -->
+                        <path d="M 250 80 C 220 80 190 110 180 160 C 210 175 290 175 320 160 C 310 110 280 80 250 80 Z"/>
+                        <!-- Hat Crown Indent Center -->
+                        <path d="M 230 85 C 250 100 270 100 290 85 C 270 92 250 92 230 85 Z" fill="#000000" opacity="0.2"/>
+                        <!-- Fedora Hat Brim -->
+                        <path d="M 100 240 C 170 210 330 210 400 240 C 440 258 390 290 320 280 C 230 255 170 270 100 280 C 50 285 60 255 100 240 Z"/>
+                        <!-- Hat Ribbon Line -->
+                        <path d="M 175 185 C 220 195 280 195 325 185 C 322 205 178 205 175 185 Z" fill="#ff003c"/>
+                        <!-- Glowing Angled Spy Eyes / Glasses Silhouette -->
+                        <path d="M 170 330 Q 210 320 235 348 Q 200 375 160 350 Z" fill="#ffffff"/>
+                        <path d="M 330 330 Q 290 320 265 348 Q 300 375 340 350 Z" fill="#ffffff"/>
+                    </g>
+                </svg>
+            </div>
+            
+            <h2 class="lock-title glitch-text-red">OSINTTOMMY</h2>
+            <p class="lock-subtitle">TACTICAL RECONNAISSANCE PLATFORM v8.0</p>
+            
+            <div class="passcode-wrapper">
+                <input type="password" id="passcode-input" class="login-input heavy-font" placeholder="ENTER ACCESS CODE" autofocus>
+            </div>
+            <button class="red-btn heavy-font mt-4" onclick="verifyCode()">AUTHENTICATE OPERATOR</button>
+            <div id="error-msg" class="error-msg heavy-font">[!] ACCESS DENIED: INVALID PASSCODE</div>
+        </div>
+    </div>
+
+    <!-- Main Workspace Application -->
+    <div id="main-app" class="heavy-font">
+        <header>
+            <div class="flex items-center gap-5">
+                <div class="w-16 h-16 filter drop-shadow-[0_0_15px_rgba(255,0,60,0.8)]">
+                    <svg viewBox="0 0 500 500" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                        <g fill="#ffffff">
+                            <path d="M 250 80 C 220 80 190 110 180 160 C 210 175 290 175 320 160 C 310 110 280 80 250 80 Z"/>
+                            <path d="M 100 240 C 170 210 330 210 400 240 C 440 258 390 290 320 280 C 230 255 170 270 100 280 C 50 285 60 255 100 240 Z"/>
+                            <path d="M 175 185 C 220 195 280 195 325 185 C 322 205 178 205 175 185 Z" fill="#ff003c"/>
+                            <path d="M 170 330 Q 210 320 235 348 Q 200 375 160 350 Z" fill="#ffffff"/>
+                            <path d="M 330 330 Q 290 320 265 348 Q 300 375 340 350 Z" fill="#ffffff"/>
+                        </g>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="glitch-text-red text-3xl">OSINTTOMMY</h1>
+                    <span class="text-xs text-red-400 tracking-widest opacity-90 mono-font">NEXT-GEN CYBER INTELLIGENCE SUITE</span>
+                </div>
+            </div>
+            <div class="bg-black border-2 border-red-600 text-red-400 px-6 py-2 rounded-xl text-xs shadow-[0_0_20px_rgba(255,0,60,0.4)] mono-font">
+                STATUS: CRIMSON NODE ENCRYPTED
+            </div>
+        </header>
+
+        <div class="flex gap-4 flex-wrap mb-8">
+            <button class="tool-tab active" onclick="switchTool('discord')">Discord Intelligence</button>
+            <button class="tool-tab" onclick="switchTool('custom')">DNS Resolver</button>
+            <button class="tool-tab" onclick="switchTool('ip')">IP & Telemetry</button>
+            <button class="tool-tab" onclick="switchTool('breach')">MX Security Radar</button>
+        </div>
+
+        <div class="workspace red-glass-card">
+            
+            <!-- Discord Module -->
+            <div id="panel-discord" class="tool-panel active">
+                <h3 class="text-2xl text-white mb-2">Discord Target Recon</h3>
+                <p class="text-xs text-red-300 mb-8 mono-font">Convert Discord Snowflake User IDs into precise UTC creation dates, system processes, and worker nodes.</p>
+                <div class="flex gap-4 mb-8">
+                    <input type="text" id="discord-input" class="osint-input flex-1 heavy-font" placeholder="Enter Discord User ID (e.g. 155149108183695360)...">
+                    <button class="red-btn !w-auto px-10 heavy-font" onclick="runScan('discord')">EXECUTE SCAN</button>
+                </div>
+                <div id="loading-discord" class="hidden text-red-400 mb-4 animate-pulse mono-font">[-] Intercepting Discord Gateway telemetry...</div>
+                <div id="results-discord" class="results-box mono-font"></div>
+            </div>
+
+            <!-- Custom DNS Module -->
+            <div id="panel-custom" class="tool-panel">
+                <h3 class="text-2xl text-white mb-2">DNS Cloudflare Resolver</h3>
+                <p class="text-xs text-red-300 mb-8 mono-font">Perform DNS-over-HTTPS resolution across encrypted edge clusters for target domain names.</p>
+                <div class="flex gap-4 mb-8">
+                    <input type="text" id="custom-input" class="osint-input flex-1 heavy-font" placeholder="Enter Domain (e.g. google.com)...">
+                    <button class="red-btn !w-auto px-10 heavy-font" onclick="runScan('custom')">QUERY DNS</button>
+                </div>
+                <div id="loading-custom" class="hidden text-red-400 mb-4 animate-pulse mono-font">[-] Querying Cloudflare DNS network...</div>
+                <div id="results-custom" class="results-box mono-font"></div>
+            </div>
+
+            <!-- IP Telemetry Module -->
+            <div id="panel-ip" class="tool-panel">
+                <h3 class="text-2xl text-white mb-2">IP & Geolocation Telemetry</h3>
+                <p class="text-xs text-red-300 mb-8 mono-font">Query real-time ASN, geolocation coordinates, routing ISPs, and network infrastructure.</p>
+                <div class="flex gap-4 mb-8">
+                    <input type="text" id="ip-input" class="osint-input flex-1 heavy-font" placeholder="Enter IP Address (leave blank for self)...">
+                    <button class="red-btn !w-auto px-10 heavy-font" onclick="runScan('ip')">ANALYZE TELEMETRY</button>
+                </div>
+                <div id="loading-ip" class="hidden text-red-400 mb-4 animate-pulse mono-font">[-] Tracing IP geolocation vectors...</div>
+                <div id="results-ip" class="results-box mono-font"></div>
+            </div>
+
+            <!-- MX Radar Module -->
+            <div id="panel-breach" class="tool-panel">
+                <h3 class="text-2xl text-white mb-2">MX Infrastructure Radar</h3>
+                <p class="text-xs text-red-300 mb-8 mono-font">Scan mail exchange routing servers and organizational domain infrastructure.</p>
+                <div class="flex gap-4 mb-8">
+                    <input type="text" id="breach-input" class="osint-input flex-1 heavy-font" placeholder="Enter Target Domain...">
+                    <button class="red-btn !w-auto px-10 heavy-font" onclick="runScan('breach')">AUDIT MX ROUTE</button>
+                </div>
+                <div id="loading-breach" class="hidden text-red-400 mb-4 animate-pulse mono-font">[-] Auditing mail server infrastructure...</div>
+                <div id="results-breach" class="results-box mono-font"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function verifyCode() {
+            const val = document.getElementById('passcode-input').value.trim();
+            const err = document.getElementById('error-msg');
+            const screen = document.getElementById('login-screen');
+            const app = document.getElementById('main-app');
+
+            if (val === 'x1') {
+                screen.style.opacity = '0';
+                screen.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    screen.style.display = 'none';
+                    app.style.display = 'block';
+                }, 700);
+            } else {
+                err.style.display = 'block';
+            }
+        }
+
+        document.getElementById('passcode-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') verifyCode();
+        });
+
+        function switchTool(toolName) {
+            document.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            document.getElementById('panel-' + toolName).classList.add('active');
+        }
+
+        async function runScan(type) {
+            const inputEl = document.getElementById(type + '-input');
+            const loadingEl = document.getElementById('loading-' + type);
+            const resultsEl = document.getElementById('results-' + type);
+
+            if (!inputEl || !loadingEl || !resultsEl) return;
+            const inputVal = inputEl.value.trim();
+
+            loadingEl.style.display = 'block';
+            resultsEl.style.display = 'none';
+
+            let output = `[+] OSINTTOMMY TARGET NODE: ${inputVal || 'LOCAL_HOST'}\n`;
+            output += `[+] SCAN TIMESTAMP: ${new Date().toISOString()}\n`;
+            output += `--------------------------------------------------\n`;
+
+            try {
+                if (type === 'discord') {
+                    if (!/^\d{17,20}$/.test(inputVal)) {
+                        output += `[ERROR] Invalid Discord ID format! Please input a valid 17-20 digit Snowflake ID.`;
+                    } else {
+                        const epoch = 1420070400000n;
+                        const idBig = BigInt(inputVal);
+                        const timestamp = Number((idBig >> 22n) + epoch);
+                        const creationDate = new Date(timestamp);
+
+                        output += `[SUCCESS] Snowflake Decoded via OsintTommy Engine!\n`;
+                        output += `[ACCOUNT CREATED] : ${creationDate.toUTCString()}\n`;
+                        output += `[ISO TIMESTAMP]   : ${creationDate.toISOString()}\n`;
+                        output += `[UNIX TIMESTAMP]  : ${timestamp} ms\n`;
+                        output += `[WORKER NODE]     : ${(idBig & 0x3E0000n) >> 17n}\n`;
+                        output += `[PROCESS ID]      : ${(idBig & 0x1F000n) >> 12n}\n`;
+                        output += `[INCREMENTAL]     : ${idBig & 0xFFFn}\n`;
+                        output += `[AVATAR VECTOR]   : https://cdn.discordapp.com/avatars/${inputVal}/`;
+                    }
+                } else if (type === 'ip') {
+                    const targetIp = inputVal ? inputVal : '';
+                    const res = await fetch(`https://ipapi.co/${targetIp}/json/`);
+                    if (!res.ok) throw new Error('Failed to query IP Telemetry API');
+                    const data = await res.json();
+
+                    output += `[SUCCESS] Telemetry Successfully Intercepted!\n`;
+                    output += `[IP ADDRESS] : ${data.ip}\n`;
+                    output += `[LOCATION]   : ${data.city}, ${data.region} (${data.region_code})\n`;
+                    output += `[COUNTRY]    : ${data.country_name} (${data.country_code_iso3})\n`;
+                    output += `[POSTAL]     : ${data.postal || 'N/A'}\n`;
+                    output += `[COORDINATES]: ${data.latitude}, ${data.longitude}\n`;
+                    output += `[TIMEZONE]   : ${data.timezone}\n`;
+                    output += `[ASN / NET]  : ${data.asn} (${data.org || data.asn})\n`;
+                    output += `[ISP ORG]    : ${data.network || data.org}`;
+                } else if (type === 'custom') {
+                    const domain = inputVal.replace(/^(https?:\/\/)?/, '').split('/')[0];
+                    if (!domain) throw new Error('Invalid domain format');
+
+                    const res = await fetch(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=A`, {
+                        headers: { 'Accept': 'application/dns-json' }
+                    });
+                    const data = await res.json();
+
+                    output += `[SUCCESS] Encrypted DNS Query Resolved!\n`;
+                    output += `[DOMAIN]: ${domain}\n`;
+                    if (data.Answer && data.Answer.length > 0) {
+                        data.Answer.forEach(ans => {
+                            output += `[RECORD A]: ${ans.name} -> ${ans.data} (TTL: ${ans.TTL}s)\n`;
+                        });
+                    } else {
+                        output += `[NOTICE] No direct A records found. Status code: ${data.Status}\n`;
+                    }
+                } else if (type === 'breach') {
+                    const domain = inputVal.replace(/^(https?:\/\/)?/, '').split('/')[0];
+                    if (!domain) throw new Error('Invalid domain format');
+
+                    const res = await fetch(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=MX`, {
+                        headers: { 'Accept': 'application/dns-json' }
+                    });
+                    const data = await res.json();
+
+                    output += `[SUCCESS] Mail Server Route Audited!\n`;
+                    output += `[DOMAIN]: ${domain}\n`;
+                    if (data.Answer && data.Answer.length > 0) {
+                        data.Answer.forEach(ans => {
+                            output += `[MX ROUTE]: ${ans.data}\n`;
+                        });
+                    } else {
+                        output += `[STATUS] No active MX records detected for target domain.\n`;
+                    }
+                }
+            } catch (err) {
+                output += `[ERROR] Intelligence Scan Failed: ${err.message}`;
+            } finally {
+                loadingEl.style.display = 'none';
+                resultsEl.style.display = 'block';
+                resultsEl.innerText = output;
+            }
+        }
+
+        /* Red Crimson Animated Mesh Background Canvas */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let step = 0;
+        function animateRedMesh() {
+            ctx.fillStyle = '#030305';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = 'rgba(255, 0, 60, 0.25)';
+            ctx.lineWidth = 1.2;
+
+            const rows = 24;
+            const cols = 34;
+            const spacingX = canvas.width / cols;
+            const spacingY = canvas.height / rows;
+
+            step += 0.02;
+
+            for (let r = 0; r <= rows; r++) {
+                ctx.beginPath();
+                for (let c = 0; c <= cols; c++) {
+                    const x = c * spacingX;
+                    const wave = Math.sin(c * 0.4 + step) * Math.cos(r * 0.3 + step) * 26;
+                    const y = (r * spacingY) + wave;
+
+                    if (c === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+
+            for (let c = 0; c <= cols; c++) {
+                ctx.beginPath();
+                for (let r = 0; r <= rows; r++) {
+                    const x = c * spacingX;
+                    const wave = Math.sin(c * 0.4 + step) * Math.cos(r * 0.3 + step) * 26;
+                    const y = (r * spacingY) + wave;
+
+                    if (r === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+
+            requestAnimationFrame(animateRedMesh);
+        }
+        animateRedMesh();
+    </script>
+</body>
+</html>
